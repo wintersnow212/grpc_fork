@@ -77,6 +77,7 @@ int main(int argc, char** argv) {
   // the argument "--target=" which is the only expected argument.
   // We indicate that the channel isn't authenticated (use of
   // InsecureChannelCredentials()).
+  int test = 0;
   std::string target_str;
   std::string arg_str("--target");
   if (argc > 1) {
