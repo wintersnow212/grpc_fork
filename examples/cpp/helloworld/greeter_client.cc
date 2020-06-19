@@ -22,6 +22,8 @@
 
 #include <grpcpp/grpcpp.h>
 
+static const test = 1;
+
 #ifdef BAZEL_BUILD
 #include "examples/protos/helloworld.grpc.pb.h"
 #else
