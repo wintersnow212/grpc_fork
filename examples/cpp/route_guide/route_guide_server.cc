@@ -91,14 +91,21 @@ class RouteGuideImpl final : public RouteGuide::Service {
   explicit RouteGuideImpl(const std::string& db) {
     routeguide::ParseDb(db, &feature_list_);
   }
-
+  // Gets a Point from the client and
+  // returns the corresponding feature information from its database in a Feature
+  // The method is passed 1) a context object for the RPC, 
+  // 2) the client’s Point protocol buffer request, 
+  // 3) and a Feature protocol buffer to fill in with the response information.
   Status GetFeature(ServerContext* context, const Point* point,
                     Feature* feature) override {
     feature->set_name(GetFeatureName(*point, feature_list_));
     feature->mutable_location()->CopyFrom(*point);
     return Status::OK;
   }
-
+  
+  // A server-to-client streaming RPC.
+  // ListFeatures is a server-side streaming RPC, 
+  // so we need to send back multiple Features to our client.
   Status ListFeatures(ServerContext* context,
                       const routeguide::Rectangle* rectangle,
                       ServerWriter<Feature>* writer) override {
@@ -149,6 +156,8 @@ class RouteGuideImpl final : public RouteGuide::Service {
     return Status::OK;
   }
 
+  // Bidirectional streaming RPC using ServerReaderWriter
+  // TODO_XIA who develop the ServerReader; ServerReaderWriter
   Status RouteChat(ServerContext* context,
                    ServerReaderWriter<RouteNote, RouteNote>* stream) override {
     RouteNote note;

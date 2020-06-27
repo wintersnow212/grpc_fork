@@ -40,11 +40,21 @@ using helloworld::Greeter;
 
 // Logic and data behind the server's behavior.
 class GreeterServiceImpl final : public Greeter::Service {
+
+  // TODO_XIA It seems that the fuction names in server side need to match the client's???
   Status SayHello(ServerContext* context, const HelloRequest* request,
                   HelloReply* reply) override {
     std::string prefix("Hello ");
-    reply->set_message(prefix + request->name());
+    reply->set_message(prefix + request->name() + " " + std::to_string(request->tianyuid()));
     return Status::OK;
+  }
+
+  Status SayHelloAgain(ServerContext* context, const HelloRequest* request, 
+                       HelloReply* reply) override 
+  {
+      std::string prefix("Hello ");
+      reply->set_message(prefix + request->name());
+      return Status::OK;
   }
 };
 
@@ -59,6 +69,9 @@ void RunServer() {
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
   // Register "service" as the instance through which we'll communicate with
   // clients. In this case it corresponds to an *synchronous* service.
+  // TODO_XIA work automatically?? 
+  // Seems like it register callback and will be invoked later... Maybe at BuildAndStart??
+  // Look at the server_builder.cc
   builder.RegisterService(&service);
   // Finally assemble the server.
   std::unique_ptr<Server> server(builder.BuildAndStart());

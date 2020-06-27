@@ -74,7 +74,7 @@ RouteNote MakeRouteNote(const std::string& message,
 class RouteGuideClient {
  public:
   RouteGuideClient(std::shared_ptr<Channel> channel, const std::string& db)
-      : stub_(RouteGuide::NewStub(channel)) {
+      : stub_(routeguide::RouteGuide::NewStub(channel)) {
     routeguide::ParseDb(db, &feature_list_);
   }
 
@@ -128,6 +128,7 @@ class RouteGuideClient {
     std::uniform_int_distribution<int> delay_distribution(
         500, 1500);
 
+    // TODO_XIA ClientWriter looks like the grpc feature!!!
     std::unique_ptr<ClientWriter<Point> > writer(
         stub_->RecordRoute(&context, &stats));
     for (int i = 0; i < kPoints; i++) {
@@ -161,6 +162,7 @@ class RouteGuideClient {
     std::shared_ptr<ClientReaderWriter<RouteNote, RouteNote> > stream(
         stub_->RouteChat(&context));
 
+    // TODO_XIA std thread with lambda 
     std::thread writer([stream]() {
       std::vector<RouteNote> notes{
         MakeRouteNote("First message", 0, 0),

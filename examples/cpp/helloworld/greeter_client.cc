@@ -22,8 +22,6 @@
 
 #include <grpcpp/grpcpp.h>
 
-static const test = 1;
-
 #ifdef BAZEL_BUILD
 #include "examples/protos/helloworld.grpc.pb.h"
 #else
@@ -37,6 +35,7 @@ using helloworld::HelloRequest;
 using helloworld::HelloReply;
 using helloworld::Greeter;
 
+
 class GreeterClient {
  public:
   GreeterClient(std::shared_ptr<Channel> channel)
@@ -48,10 +47,9 @@ class GreeterClient {
     // Data we are sending to the server.
     HelloRequest request;
     request.set_name(user);
-
+    request.set_tianyuid(66);
     // Container for the data we expect from the server.
     HelloReply reply;
-
     // Context for the client. It could be used to convey extra information to
     // the server and/or tweak certain RPC behaviors.
     ClientContext context;
@@ -69,6 +67,29 @@ class GreeterClient {
     }
   }
 
+  std::string SayHelloAgain() {
+    // Data we are sending to the server.
+    HelloRequest request;
+    // Container for the data we expect from the server.
+    HelloReply reply;
+    // Context for the client. It could be used to convey extra information to
+    // the server and/or tweak certain RPC behaviors.
+    ClientContext context;
+
+    request.set_name("Tianyu");
+    // The actual RPC.
+    Status status = stub_->SayHelloAgain(&context, request, &reply);
+
+    // Act upon its status.
+    if (status.ok()) {
+      return reply.message();
+    } else {
+      std::cout << status.error_code() << ": " << status.error_message()
+                << std::endl;
+      return "RPC failed";
+    }    
+  }
+
  private:
   std::unique_ptr<Greeter::Stub> stub_;
 };
@@ -79,7 +100,6 @@ int main(int argc, char** argv) {
   // the argument "--target=" which is the only expected argument.
   // We indicate that the channel isn't authenticated (use of
   // InsecureChannelCredentials()).
-  int test = 0;
   std::string target_str;
   std::string arg_str("--target");
   if (argc > 1) {
@@ -104,6 +124,9 @@ int main(int argc, char** argv) {
       target_str, grpc::InsecureChannelCredentials()));
   std::string user("world");
   std::string reply = greeter.SayHello(user);
+  std::cout << "Greeter received: " << reply << std::endl;
+
+  reply = greeter.SayHelloAgain();
   std::cout << "Greeter received: " << reply << std::endl;
 
   return 0;

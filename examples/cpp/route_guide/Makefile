@@ -33,6 +33,9 @@ endif
 PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
+#It cannot find the grpc_cpp_plugin for some reason. I can either add it to Path to make it findable
+#Or force it here
+#GRPC_CPP_PLUGIN_PATH = /Users/summerrain/Documents/GitHub/grpc_fork/cmake/build/grpc_cpp_plugin
 
 PROTOS_PATH = ../../protos
 
