@@ -174,6 +174,14 @@ class ServerContextBase {
   /// ASCII-Value -> 1*( %x20-%x7E ) ; space and printable ASCII
   void AddTrailingMetadata(const grpc::string& key, const grpc::string& value);
 
+  /// Return whether this RPC failed before the server could provide its status
+  /// back to the client. This could be because of explicit API cancellation
+  /// from the client-side or server-side, because of deadline exceeded, network
+  /// connection reset, HTTP/2 parameter configuration (e.g., max message size,
+  /// max connection age), etc. It does NOT include failure due to a non-OK
+  /// status return from the server application's request handler, including
+  /// Status::CANCELLED.
+  ///
   /// IsCancelled is always safe to call when using sync or callback API.
   /// When using async API, it is only safe to call IsCancelled after
   /// the AsyncNotifyWhenDone tag has been delivered. Thread-safe.
@@ -181,16 +189,18 @@ class ServerContextBase {
 
   /// Cancel the Call from the server. This is a best-effort API and
   /// depending on when it is called, the RPC may still appear successful to
-  /// the client.
-  /// For example, if TryCancel() is called on a separate thread, it might race
-  /// with the server handler which might return success to the client before
-  /// TryCancel() was even started by the thread.
+  /// the client. For example, if TryCancel() is called on a separate thread, it
+  /// might race with the server handler which might return success to the
+  /// client before TryCancel() was even started by the thread.
   ///
   /// It is the caller's responsibility to prevent such races and ensure that if
   /// TryCancel() is called, the serverhandler must return Status::CANCELLED.
   /// The only exception is that if the serverhandler is already returning an
   /// error status code, it is ok to not return Status::CANCELLED even if
   /// TryCancel() was called.
+  ///
+  /// For reasons such as the above, it is generally preferred to explicitly
+  /// finish an RPC by returning Status::CANCELLED rather than using TryCancel.
   ///
   /// Note that TryCancel() does not change any of the tags that are pending
   /// on the completion queue. All pending tags will still be delivered
@@ -513,9 +523,6 @@ class ServerContext : public ServerContextBase {
 
   using ServerContextBase::AddInitialMetadata;
   using ServerContextBase::AddTrailingMetadata;
-  using ServerContextBase::IsCancelled;
-  using ServerContextBase::SetLoadReportingCosts;
-  using ServerContextBase::TryCancel;
   using ServerContextBase::auth_context;
   using ServerContextBase::c_call;
   using ServerContextBase::census_context;
@@ -524,10 +531,13 @@ class ServerContext : public ServerContextBase {
   using ServerContextBase::compression_level;
   using ServerContextBase::compression_level_set;
   using ServerContextBase::deadline;
+  using ServerContextBase::IsCancelled;
   using ServerContextBase::peer;
   using ServerContextBase::raw_deadline;
   using ServerContextBase::set_compression_algorithm;
   using ServerContextBase::set_compression_level;
+  using ServerContextBase::SetLoadReportingCosts;
+  using ServerContextBase::TryCancel;
 
   // Sync/CQ-based Async ServerContext only
   using ServerContextBase::AsyncNotifyWhenDone;
@@ -555,9 +565,6 @@ class CallbackServerContext : public ServerContextBase {
 
   using ServerContextBase::AddInitialMetadata;
   using ServerContextBase::AddTrailingMetadata;
-  using ServerContextBase::IsCancelled;
-  using ServerContextBase::SetLoadReportingCosts;
-  using ServerContextBase::TryCancel;
   using ServerContextBase::auth_context;
   using ServerContextBase::c_call;
   using ServerContextBase::census_context;
@@ -566,10 +573,13 @@ class CallbackServerContext : public ServerContextBase {
   using ServerContextBase::compression_level;
   using ServerContextBase::compression_level_set;
   using ServerContextBase::deadline;
+  using ServerContextBase::IsCancelled;
   using ServerContextBase::peer;
   using ServerContextBase::raw_deadline;
   using ServerContextBase::set_compression_algorithm;
   using ServerContextBase::set_compression_level;
+  using ServerContextBase::SetLoadReportingCosts;
+  using ServerContextBase::TryCancel;
 
   // CallbackServerContext only
   using ServerContextBase::DefaultReactor;

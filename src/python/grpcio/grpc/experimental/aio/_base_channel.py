@@ -14,14 +14,14 @@
 """Abstract base classes for Channel objects and Multicallable objects."""
 
 import abc
-from typing import Any, AsyncIterable, Optional
+from typing import Any, Optional
 
 import grpc
 
 from . import _base_call
-from ._typing import DeserializingFunction, MetadataType, SerializingFunction
-
-_IMMUTABLE_EMPTY_TUPLE = tuple()
+from ._typing import (DeserializingFunction, RequestIterableType,
+                      SerializingFunction)
+from ._metadata import Metadata
 
 
 class UnaryUnaryMultiCallable(abc.ABC):
@@ -32,7 +32,7 @@ class UnaryUnaryMultiCallable(abc.ABC):
                  request: Any,
                  *,
                  timeout: Optional[float] = None,
-                 metadata: Optional[MetadataType] = _IMMUTABLE_EMPTY_TUPLE,
+                 metadata: Optional[Metadata] = None,
                  credentials: Optional[grpc.CallCredentials] = None,
                  wait_for_ready: Optional[bool] = None,
                  compression: Optional[grpc.Compression] = None
@@ -48,7 +48,7 @@ class UnaryUnaryMultiCallable(abc.ABC):
           credentials: An optional CallCredentials for the RPC. Only valid for
             secure Channel.
           wait_for_ready: This is an EXPERIMENTAL argument. An optional
-            flag to enable wait for ready mechanism
+            flag to enable :term:`wait_for_ready` mechanism.
           compression: An element of grpc.compression, e.g.
             grpc.compression.Gzip. This is an EXPERIMENTAL option.
 
@@ -70,7 +70,7 @@ class UnaryStreamMultiCallable(abc.ABC):
                  request: Any,
                  *,
                  timeout: Optional[float] = None,
-                 metadata: Optional[MetadataType] = _IMMUTABLE_EMPTY_TUPLE,
+                 metadata: Optional[Metadata] = None,
                  credentials: Optional[grpc.CallCredentials] = None,
                  wait_for_ready: Optional[bool] = None,
                  compression: Optional[grpc.Compression] = None
@@ -86,7 +86,7 @@ class UnaryStreamMultiCallable(abc.ABC):
           credentials: An optional CallCredentials for the RPC. Only valid for
             secure Channel.
           wait_for_ready: This is an EXPERIMENTAL argument. An optional
-            flag to enable wait for ready mechanism
+            flag to enable :term:`wait_for_ready` mechanism.
           compression: An element of grpc.compression, e.g.
             grpc.compression.Gzip. This is an EXPERIMENTAL option.
 
@@ -105,9 +105,9 @@ class StreamUnaryMultiCallable(abc.ABC):
 
     @abc.abstractmethod
     def __call__(self,
-                 request_async_iterator: Optional[AsyncIterable[Any]] = None,
+                 request_iterator: Optional[RequestIterableType] = None,
                  timeout: Optional[float] = None,
-                 metadata: Optional[MetadataType] = _IMMUTABLE_EMPTY_TUPLE,
+                 metadata: Optional[Metadata] = None,
                  credentials: Optional[grpc.CallCredentials] = None,
                  wait_for_ready: Optional[bool] = None,
                  compression: Optional[grpc.Compression] = None
@@ -115,7 +115,8 @@ class StreamUnaryMultiCallable(abc.ABC):
         """Asynchronously invokes the underlying RPC.
 
         Args:
-          request: The request value for the RPC.
+          request_iterator: An optional async iterable or iterable of request
+            messages for the RPC.
           timeout: An optional duration of time in seconds to allow
             for the RPC.
           metadata: Optional :term:`metadata` to be transmitted to the
@@ -123,7 +124,7 @@ class StreamUnaryMultiCallable(abc.ABC):
           credentials: An optional CallCredentials for the RPC. Only valid for
             secure Channel.
           wait_for_ready: This is an EXPERIMENTAL argument. An optional
-            flag to enable wait for ready mechanism
+            flag to enable :term:`wait_for_ready` mechanism.
           compression: An element of grpc.compression, e.g.
             grpc.compression.Gzip. This is an EXPERIMENTAL option.
 
@@ -142,9 +143,9 @@ class StreamStreamMultiCallable(abc.ABC):
 
     @abc.abstractmethod
     def __call__(self,
-                 request_async_iterator: Optional[AsyncIterable[Any]] = None,
+                 request_iterator: Optional[RequestIterableType] = None,
                  timeout: Optional[float] = None,
-                 metadata: Optional[MetadataType] = _IMMUTABLE_EMPTY_TUPLE,
+                 metadata: Optional[Metadata] = None,
                  credentials: Optional[grpc.CallCredentials] = None,
                  wait_for_ready: Optional[bool] = None,
                  compression: Optional[grpc.Compression] = None
@@ -152,7 +153,8 @@ class StreamStreamMultiCallable(abc.ABC):
         """Asynchronously invokes the underlying RPC.
 
         Args:
-          request: The request value for the RPC.
+          request_iterator: An optional async iterable or iterable of request
+            messages for the RPC.
           timeout: An optional duration of time in seconds to allow
             for the RPC.
           metadata: Optional :term:`metadata` to be transmitted to the
@@ -160,7 +162,7 @@ class StreamStreamMultiCallable(abc.ABC):
           credentials: An optional CallCredentials for the RPC. Only valid for
             secure Channel.
           wait_for_ready: This is an EXPERIMENTAL argument. An optional
-            flag to enable wait for ready mechanism
+            flag to enable :term:`wait_for_ready` mechanism.
           compression: An element of grpc.compression, e.g.
             grpc.compression.Gzip. This is an EXPERIMENTAL option.
 
@@ -271,9 +273,9 @@ class Channel(abc.ABC):
 
         Args:
           method: The name of the RPC method.
-          request_serializer: Optional behaviour for serializing the request
+          request_serializer: Optional :term:`serializer` for serializing the request
             message. Request goes unserialized in case None is passed.
-          response_deserializer: Optional behaviour for deserializing the
+          response_deserializer: Optional :term:`deserializer` for deserializing the
             response message. Response goes undeserialized in case None
             is passed.
 
@@ -292,9 +294,9 @@ class Channel(abc.ABC):
 
         Args:
           method: The name of the RPC method.
-          request_serializer: Optional behaviour for serializing the request
+          request_serializer: Optional :term:`serializer` for serializing the request
             message. Request goes unserialized in case None is passed.
-          response_deserializer: Optional behaviour for deserializing the
+          response_deserializer: Optional :term:`deserializer` for deserializing the
             response message. Response goes undeserialized in case None
             is passed.
 
@@ -313,9 +315,9 @@ class Channel(abc.ABC):
 
         Args:
           method: The name of the RPC method.
-          request_serializer: Optional behaviour for serializing the request
+          request_serializer: Optional :term:`serializer` for serializing the request
             message. Request goes unserialized in case None is passed.
-          response_deserializer: Optional behaviour for deserializing the
+          response_deserializer: Optional :term:`deserializer` for deserializing the
             response message. Response goes undeserialized in case None
             is passed.
 
@@ -334,9 +336,9 @@ class Channel(abc.ABC):
 
         Args:
           method: The name of the RPC method.
-          request_serializer: Optional behaviour for serializing the request
+          request_serializer: Optional :term:`serializer` for serializing the request
             message. Request goes unserialized in case None is passed.
-          response_deserializer: Optional behaviour for deserializing the
+          response_deserializer: Optional :term:`deserializer` for deserializing the
             response message. Response goes undeserialized in case None
             is passed.
 

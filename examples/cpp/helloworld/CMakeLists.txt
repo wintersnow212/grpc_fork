@@ -22,8 +22,10 @@ cmake_minimum_required(VERSION 3.5.1)
 project(HelloWorld C CXX)
 
 # TODO_XIA
-set(CMAKE_PREFIX_PATH "/Users/summerrain/.local")
+#set(CMAKE_PREFIX_PATH "/Users/summerrain/.local")
 #set(CMAKE_PREFIX_PATH "/usr/local")
+#set(CMAKE_PREFIX_PATH "/Users/summerrain/Documents/GitHub/grpc_fork/third_party/protobuf/src/google/protobuf")
+#list(APPEND CMAKE_PREFIX_PATH "/Users/summerrain/Documents/GitHub/grpc_fork/cmake/build/third_party/protobuf/lib/;/Users/summerrain/Documents/GitHub/grpc_fork/third_party/protobuf/src/google/protobuf/")
 
 if(NOT MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -104,7 +106,9 @@ else()
   # Find Protobuf installation
   # Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
   set(protobuf_MODULE_COMPATIBLE TRUE)
-  find_package(Protobuf CONFIG REQUIRED)
+  #TODO_XIA
+  find_package(Protobuf CONFIG REQUIRED PATHS /Users/summerrain/Documents/GitHub/grpc_fork/cmake/build/third_party/protobuf/lib/cmake/)
+  #find_package(Protobuf CONFIG REQUIRED)
   message(STATUS "Using protobuf ${protobuf_VERSION}")
 
   set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
@@ -117,7 +121,8 @@ else()
 
   # Find gRPC installation
   # Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.
-  find_package(gRPC CONFIG REQUIRED)
+  #TODO_XIA
+  find_package(gRPC CONFIG REQUIRED PATHS /Users/summerrain/.local/lib/cmake/grpc)
   message(STATUS "Using gRPC ${gRPC_VERSION}")
 
   set(_GRPC_GRPCPP gRPC::grpc++)

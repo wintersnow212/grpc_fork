@@ -90,6 +90,7 @@ grpc_cc_test(
 
 grpc_cc_test(
     name = "bm_arena",
+    size = "large",
     srcs = ["bm_arena.cc"],
     tags = [
         "no_mac",
@@ -218,6 +219,7 @@ grpc_cc_test(
     srcs = ["bm_fullstack_trickle.cc"],
     tags = [
         "manual",
+        "no_windows",
         "notap",
     ],
     deps = [":helpers"],
@@ -315,6 +317,7 @@ grpc_cc_test(
     srcs = ["bm_threadpool.cc"],
     tags = [
         "manual",
+        "no_windows",
         "notap",
     ],
     uses_polling = False,

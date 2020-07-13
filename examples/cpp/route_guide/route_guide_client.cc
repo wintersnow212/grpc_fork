@@ -217,6 +217,9 @@ class RouteGuideClient {
   }
 
   const float kCoordFactor_ = 10000000.0;
+
+  // TODO_XIA the stub is in route_guide.grpc.pb.h
+  // class Stub final : public StubInterface
   std::unique_ptr<RouteGuide::Stub> stub_;
   std::vector<Feature> feature_list_;
 };
@@ -225,8 +228,7 @@ int main(int argc, char** argv) {
   // Expect only arg: --db_path=path/to/route_guide_db.json.
   std::string db = routeguide::GetDbFileContent(argc, argv);
   RouteGuideClient guide(
-      grpc::CreateChannel("localhost:50051",
-                          grpc::InsecureChannelCredentials()),
+      grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()),
       db);
 
   std::cout << "-------------- GetFeature --------------" << std::endl;

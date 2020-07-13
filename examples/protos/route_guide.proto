@@ -19,6 +19,9 @@ option java_package = "io.grpc.examples.routeguide";
 option java_outer_classname = "RouteGuideProto";
 option objc_class_prefix = "RTG";
 
+// TODO_XIA The .proto file starts with a package declaration, which helps to prevent naming conflicts between different projects. 
+// In C++, your generated classes will be placed in a namespace matching the package name.
+// So all the generated files will be placed in the routeguide namespace!!
 package routeguide;
 
 // Interface exported by the server.
@@ -69,6 +72,12 @@ message Rectangle {
 
   // The other corner of the rectangle.
   Point hi = 2;
+}
+
+// TODO_XIA 
+message Square {
+  int32 center = 1;
+  int32 radius = 2;
 }
 
 // A feature names something at a given point.
